@@ -65,6 +65,17 @@ airbnb2$season <- ifelse(airbnb2$month %in% c(12,1,2),  "Winter",
                                 ifelse(airbnb2$month %in% c(6,7,8),   "Summer", "Autumn")))
 library(ggplot2)
 
+#TOPIC MODELLING (all reviews together)
+processed <- textProcessor(airbnb2$comments, metadata = airbnb2)
+out  <- prepDocuments(processed$documents, processed$vocab, processed$meta)
+meta <- out$meta
+
+tm_1 <- stm(out$documents, out$vocab, K = 8, prevalence = ~sentiment_score,
+            max.em.its = 75, data = out$meta, init.type = "Spectral",
+            seed = 3559)
+
+plot(tm_1, type = "summary", main = "Whole year")
+
 #WINTER
 sub_winter <- airbnb2[airbnb2$season == 'Winter', ]
 processed_winter <- textProcessor(sub_winter$comments, metadata=sub_winter)
